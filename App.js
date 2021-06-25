@@ -4,7 +4,7 @@ import { StyleSheet, View, Platform } from 'react-native'
 import { Text, Overlay, ListItem, Badge} from 'react-native-elements'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import {SAge, SWeight, SHeight, BSL, SType} from './inputs'
-import { DIN_M, WEIGHTS, HEIGHTS, BSLS, STYPES} from './data'
+import { DIN_M, AGES, WEIGHTS, HEIGHTS, BSLS, TYPES} from './data'
 
 const styles = StyleSheet.create({
   container: {
@@ -42,7 +42,7 @@ const Inputs = (props) => {
         age={props.age}
         setAge={props.setAge}
       />,
-      badge: props.age
+      badge: AGES[props.age]
     },
     {
       title: 'Skier Weight',
@@ -51,7 +51,7 @@ const Inputs = (props) => {
         weight={props.weight}
         setWeight={props.setWeight}
       />,
-      badge: props.weight
+      badge: WEIGHTS[props.weight]
     },
     {
       title: 'Skier Height',
@@ -60,16 +60,16 @@ const Inputs = (props) => {
         height={props.height}
         setHeight={props.setHeight}
       />,
-      badge: props.height
+      badge: HEIGHTS[props.height]
     },
     {
       title: 'Boot Sole Length',
       content: <BSL
         closeOverlay={closeOverlay}
         bsl={props.bsl}
-        setWeight={props.setBsl}
+        setBsl={props.setBsl}
       />,
-      badge: props.bsl
+      badge: BSLS[props.bsl]
     },
     {
       title: 'Skier Type',
@@ -78,7 +78,7 @@ const Inputs = (props) => {
         type={props.type}
         setType={props.setType}
       />,
-      badge: props.stype
+      badge: TYPES[props.type]
     },
   ]
 
@@ -123,9 +123,9 @@ export default function App() {
   const [weight, setWeight] = useState(null)
   const [height, setHeight] = useState(null)
   const [bsl, setBsl] = useState(null)
-  const [stype, setStype] = useState(null)
+  const [type, setType] = useState(null)
 
-  const setDIN = (a, w, h, b, s) => {
+  const setDIN = (age, weight, height, bsl, type) => {
     return "test"
   }
 
@@ -133,11 +133,11 @@ export default function App() {
     <SafeAreaView style = {{ flex: 1 }}>
       <View style = {styles.container}>
         <Inputs
-          age={age} weight={weight} height={height} bsl={bsl} stype={stype}
+          age={age} weight={weight} height={height} bsl={bsl} type={type}
           setAge={setAge} setWeight={setWeight} setHeight={setHeight}
-          setBsl={setBsl} setStype={setStype}
+          setBsl={setBsl} setType={setType}
         />
-        <Din din={setDIN(age, weight, height, bsl, stype)}/>
+        <Din din={setDIN(age, weight, height, bsl, type)}/>
       </View>
     </SafeAreaView>
   )
