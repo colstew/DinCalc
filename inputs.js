@@ -5,7 +5,7 @@ import { CircularSlider } from 'react-native-elements-universe'
 import {AGES, WEIGHTS, HEIGHTS, BSLS, TYPES} from './data'
 
 export const SAge = (props) => {
-  const [index, setIndex] = useState(props.age ? props.age : 1)
+  const [index, setIndex] = useState(props.age == null ? 1 : props.age)
   return(
     <>
       <ButtonGroup
@@ -26,7 +26,7 @@ export const SAge = (props) => {
 };
 
 export const SWeight = (props) => {
-  const [index, setIndex] = useState(props.weight ? props.weight : 1)
+  const [index, setIndex] = useState(props.weight == null ? 0 : props.weight)
   return(
     <>
     <ScrollView>
@@ -49,7 +49,7 @@ export const SWeight = (props) => {
 };
 
 export const SHeight = (props) => {
-  const [index, setIndex] = useState(props.height ? props.height : 1)
+  const [index, setIndex] = useState(props.height == null ? 0 : props.height)
   return(
     <>
     <ScrollView>
@@ -72,7 +72,7 @@ export const SHeight = (props) => {
 };
 
 export const BSL = (props) => {
-  const [index, setIndex] = useState(props.bsl ? props.bsl : 1)
+  const [index, setIndex] = useState(props.bsl == null ? 0 : props.bsl)
   return(
     <>
     <ScrollView>
@@ -95,7 +95,7 @@ export const BSL = (props) => {
 };
 
 export const SType = (props) => {
-  const [index, setIndex] = useState(props.stype ? props.stype : 1)
+  const [index, setIndex] = useState(props.type == null ? 1 : props.type)
   return(
     <>
     <ButtonGroup

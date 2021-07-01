@@ -1,7 +1,7 @@
 //import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffec} from 'react'
-import { StyleSheet, View, Platform } from 'react-native'
-import { Text, Overlay, ListItem, Badge} from 'react-native-elements'
+import { StyleSheet, View, Platform} from 'react-native'
+import { Text, Overlay, ListItem, Badge, Switch } from 'react-native-elements'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import {SAge, SWeight, SHeight, BSL, SType} from './inputs'
 import { DIN_M, AGES, WEIGHTS, HEIGHTS, BSLS, TYPES} from './data'
@@ -112,7 +112,7 @@ const Inputs = (props) => {
 const Din = (props) => {
   return(
     <View style = {styles.din} >
-     <Text h1>{props.din}</Text>
+     <Text h1>DIN = {props.din}</Text>
     </View>
   );
 };
@@ -126,12 +126,32 @@ export default function App() {
   const [type, setType] = useState(null)
 
   const setDIN = (age, weight, height, bsl, type) => {
-    return "test"
+  /*
+  1. Weight and Height, if not the same, choose the one closer to the top of the chart.
+  2. Skier Type, move down chart acording to skier type.
+  3. Age, if under 10 or 50 and over move up chart
+  4. Select column based on BSL
+  */
+
+  if (age == null) return 'Set Age'
+  if (weight == null) return 'Set Weight'
+  if (height == null) return 'Set Height'
+  if (bsl == null) return 'Set BSL'
+  if (type == null) return 'Set Type'
+
+  var i = Math.min(weight, height+7) + type
+  if (age != 1) --i
+  i = Math.max(0, i)
+
+  var j = bsl
+
+  return DIN_M[i][j]
   }
 
   return (
     <SafeAreaView style = {{ flex: 1 }}>
       <View style = {styles.container}>
+        <Switch value={true}/>
         <Inputs
           age={age} weight={weight} height={height} bsl={bsl} type={type}
           setAge={setAge} setWeight={setWeight} setHeight={setHeight}
