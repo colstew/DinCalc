@@ -1,10 +1,11 @@
-//import { StatusBar } from 'expo-status-bar';
-import React, { useState, useEffec} from 'react'
+import React, { useState, useContext } from 'react'
 import { StyleSheet, View, Platform} from 'react-native'
 import { Text, Overlay, ListItem, Badge, Switch } from 'react-native-elements'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import {SAge, SWeight, SHeight, BSL, SType} from './inputs'
-import { DIN_M, AGES, WEIGHTS, HEIGHTS, BSLS, TYPES} from './data'
+import { DIN, AGES, WEIGHTS_M, HEIGHTS_M, WEIGHTS_US, HEIGHTS_US,
+  BSLS, TYPES} from './dinData'
+  import Context from './context'
 
 const styles = StyleSheet.create({
   container: {
@@ -14,22 +15,43 @@ const styles = StyleSheet.create({
   inputs: {
     flex: 1,
   },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly'
+  },
   din: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center'
   },
-});
+})
 
-const Inputs = (props) => {
+const Options = () => {
+  return(
+    <View style={styles.row}>
+      <View style={styles.row}>
+        <Text>lbs</Text>
+        <Switch value={true}/>
+        <Text>kg</Text>
+      </View>
+      <View style={styles.row}>
+        <Text>ft'in"</Text>
+        <Switch value={true}/>
+        <Text>cm</Text>
+      </View>
+    </View>
+  )
+}
 
+const Input = () => {
+
+  const {skier, settings} = useContext(Context)
   const [visible, setVisible] = useState(false)
   const [content, setContent] = useState()
 
   const toggleOverlay = () => {
     setVisible(!visible)
   }
-
   const closeOverlay = () => {
     setVisible(false)
   }
@@ -37,48 +59,28 @@ const Inputs = (props) => {
   const components = [
     {
       title: 'Skier Age',
-      content: <SAge
-        closeOverlay={closeOverlay}
-        age={props.age}
-        setAge={props.setAge}
-      />,
-      badge: AGES[props.age]
+      content: <SAge closeOverlay={closeOverlay} />,
+      badge: AGES[skier.age]
     },
     {
       title: 'Skier Weight',
-      content: <SWeight
-        closeOverlay={closeOverlay}
-        weight={props.weight}
-        setWeight={props.setWeight}
-      />,
-      badge: WEIGHTS[props.weight]
+      content: <SWeight closeOverlay={closeOverlay} />,
+      badge: settings.weightsList[skier.weight]
     },
     {
       title: 'Skier Height',
-      content: <SHeight
-        closeOverlay={closeOverlay}
-        height={props.height}
-        setHeight={props.setHeight}
-      />,
-      badge: HEIGHTS[props.height]
+      content: <SHeight closeOverlay={closeOverlay} />,
+      badge: settings.heightsList[skier.height]
     },
     {
       title: 'Boot Sole Length',
-      content: <BSL
-        closeOverlay={closeOverlay}
-        bsl={props.bsl}
-        setBsl={props.setBsl}
-      />,
-      badge: BSLS[props.bsl]
+      content: <BSL closeOverlay={closeOverlay} />,
+      badge: BSLS[skier.bsl]
     },
     {
       title: 'Skier Type',
-      content: <SType
-        closeOverlay={closeOverlay}
-        type={props.type}
-        setType={props.setType}
-      />,
-      badge: TYPES[props.type]
+      content: <SType closeOverlay={closeOverlay} />,
+      badge: TYPES[skier.type]
     },
   ]
 
@@ -107,31 +109,30 @@ const Inputs = (props) => {
       </Overlay>
     </View>
   );
-};
+}
 
-const Din = (props) => {
+const Din = () => {
+  const {skier} = useContext(Context)
   return(
     <View style = {styles.din} >
-     <Text h1>DIN = {props.din}</Text>
+     <Text h1>DIN = {calcDIN(skier)}</Text>
     </View>
   );
-};
+}
 
-export default function App() {
+/*
+1. Weight and Height, if not the same, choose the one closer to the top of the chart.
+2. Skier Type, move down chart acording to skier type.
+3. Age, if under 10 or 50 and over move up chart
+4. Select column based on BSL
+*/
+function calcDIN(skier) {
 
-  const [age, setAge] = useState(null)
-  const [weight, setWeight] = useState(null)
-  const [height, setHeight] = useState(null)
-  const [bsl, setBsl] = useState(null)
-  const [type, setType] = useState(null)
-
-  const setDIN = (age, weight, height, bsl, type) => {
-  /*
-  1. Weight and Height, if not the same, choose the one closer to the top of the chart.
-  2. Skier Type, move down chart acording to skier type.
-  3. Age, if under 10 or 50 and over move up chart
-  4. Select column based on BSL
-  */
+  const age = skier.age
+  const weight = skier.weight
+  const height = skier.height
+  const bsl = skier.bsl
+  const type = skier.type
 
   if (age == null) return 'Set Age'
   if (weight == null) return 'Set Weight'
@@ -145,20 +146,37 @@ export default function App() {
 
   var j = bsl
 
-  return DIN_M[i][j]
+  return DIN[i][j]
+}
+
+export default function App() {
+
+  const initalSkier = {
+    age: null,
+    weight: null,
+    height: null,
+    bsl: null,
+    type: null,
   }
+  const [skier, setSkier] = useState(initalSkier)
+
+  const initalSettings = {
+    weightsList: WEIGHTS_M,
+    heightsList: HEIGHTS_M,
+  }
+  const [settings, setSettings] = useState(initalSettings)
+
+  const contextValues = {skier, setSkier, settings, setSettings}
 
   return (
     <SafeAreaView style = {{ flex: 1 }}>
-      <View style = {styles.container}>
-        <Switch value={true}/>
-        <Inputs
-          age={age} weight={weight} height={height} bsl={bsl} type={type}
-          setAge={setAge} setWeight={setWeight} setHeight={setHeight}
-          setBsl={setBsl} setType={setType}
-        />
-        <Din din={setDIN(age, weight, height, bsl, type)}/>
-      </View>
+      <Context.Provider value={contextValues}>
+        <View style = {styles.container}>
+          <Options/>
+          <Input/>
+          <Din/>
+        </View>
+      </Context.Provider>
     </SafeAreaView>
   )
-};
+}
