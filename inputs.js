@@ -27,7 +27,7 @@ export const SAge = (props) => {
 };
 
 export const SWeight = (props) => {
-  const {skier, setSkier, settings} = useContext(Context)
+  const {skier, setSkier, whSettings} = useContext(Context)
   const [index, setIndex] = useState(skier.weight == null ? 0 : skier.weight)
   return(
     <>
@@ -35,7 +35,7 @@ export const SWeight = (props) => {
       <ButtonGroup
          onPress={(index) => setIndex(index)}
          selectedIndex={index}
-         buttons={settings.weightsList}
+         buttons={whSettings.weightsList}
          vertical='True'
       />
     </ScrollView>
@@ -51,7 +51,7 @@ export const SWeight = (props) => {
 };
 
 export const SHeight = (props) => {
-  const {skier, setSkier, settings} = useContext(Context)
+  const {skier, setSkier, whSettings} = useContext(Context)
   const [index, setIndex] = useState(skier.height == null ? 0 : skier.height)
   return(
     <>
@@ -59,7 +59,7 @@ export const SHeight = (props) => {
       <ButtonGroup
          onPress={(index) => setIndex(index)}
          selectedIndex={index}
-         buttons={settings.heightsList}
+         buttons={whSettings.heightsList}
          vertical='True'
       />
     </ScrollView>

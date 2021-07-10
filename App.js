@@ -1,23 +1,51 @@
 import React, { useState, useContext } from 'react'
 import { StyleSheet, View, Platform} from 'react-native'
-import { Text, Overlay, ListItem, Badge, Switch } from 'react-native-elements'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { AdMobBanner } from 'expo-ads-admob'
 import {SAge, SWeight, SHeight, BSL, SType} from './inputs'
-import { DIN, AGES, WEIGHTS_M, HEIGHTS_M, WEIGHTS_US, HEIGHTS_US,
-  BSLS, TYPES} from './dinData'
-  import Context from './context'
+import Context from './context'
+import {
+  Text,
+  Overlay,
+  ListItem,
+  Badge,
+  Button,
+  ButtonGroup,
+  Icon
+} from 'react-native-elements'
+import {
+  DIN,
+  AGES,
+  WEIGHTS_M,
+  HEIGHTS_M,
+  WEIGHTS_US,
+  HEIGHTS_US,
+  BSLS,
+  TYPES
+} from './dinData'
+
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 10,
-  },
-  inputs: {
     flex: 1,
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-evenly'
+  },
+  inputs: {
+    //flex:1,
+  },
+  settings: {
+    //flex: 1,
+    paddingTop: 20,
+    paddingRight: 20,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  settingsOverlay: {
+    padding: 25,
+    justifyContent: 'space-around',
   },
   din: {
     flex: 1,
@@ -26,26 +54,9 @@ const styles = StyleSheet.create({
   },
 })
 
-const Options = () => {
-  return(
-    <View style={styles.row}>
-      <View style={styles.row}>
-        <Text>lbs</Text>
-        <Switch value={true}/>
-        <Text>kg</Text>
-      </View>
-      <View style={styles.row}>
-        <Text>ft'in"</Text>
-        <Switch value={true}/>
-        <Text>cm</Text>
-      </View>
-    </View>
-  )
-}
+const Inputs = () => {
 
-const Input = () => {
-
-  const {skier, settings} = useContext(Context)
+  const {skier, whSettings} = useContext(Context)
   const [visible, setVisible] = useState(false)
   const [content, setContent] = useState()
 
@@ -65,12 +76,12 @@ const Input = () => {
     {
       title: 'Skier Weight',
       content: <SWeight closeOverlay={closeOverlay} />,
-      badge: settings.weightsList[skier.weight]
+      badge: whSettings.weightsList[skier.weight]
     },
     {
       title: 'Skier Height',
       content: <SHeight closeOverlay={closeOverlay} />,
-      badge: settings.heightsList[skier.height]
+      badge: whSettings.heightsList[skier.height]
     },
     {
       title: 'Boot Sole Length',
@@ -88,10 +99,15 @@ const Input = () => {
     <View style = {styles.inputs}>
       {
         components.map((l, i) => (
-          <ListItem key={i} bottomDivider onPress={() => {
-            toggleOverlay()
-            setContent(l.content)
-          }}>
+          <ListItem
+            style = {{  }}
+            key={i}
+            bottomDivider
+            onPress={() => {
+              toggleOverlay()
+              setContent(l.content)
+            }}
+          >
             <ListItem.Content>
               <ListItem.Title>{l.title}</ListItem.Title>
             </ListItem.Content>
@@ -103,19 +119,84 @@ const Input = () => {
       <Overlay
         visible= {visible}
         onBackdropPress={toggleOverlay}
-        fullScreen={true}
-        animationType={'slide'}>
+        fullScreen
+        animationType={'slide'}
+      >
         {content}
       </Overlay>
     </View>
-  );
+  )
+}
+
+const Settings = () => {
+
+  //data state
+  const {whSettings, setWHSettings} = useContext(Context)
+  const [weightUnit, setWeightUnit] = useState(0)
+  const [heightUnit, setHeightUnit] = useState(0)
+  function changeWeightUnit(unit) {
+    whSettings.weightsList = unit ? WEIGHTS_US : WEIGHTS_M
+    setWHSettings(whSettings => { return {...whSettings}})
+    setWeightUnit(unit)
+  }
+  function changeHeightUnit(unit) {
+    whSettings.heightsList = unit ? HEIGHTS_US : HEIGHTS_M
+    setWHSettings(whSettings => { return {...whSettings}})
+    setHeightUnit(unit)
+  }
+
+  //overlay state
+  const [visible, setVisible] = useState(false)
+  const toggleOverlay = () => {
+    setVisible(!visible)
+  }
+  const closeOverlay = () => {
+    setVisible(false)
+  }
+
+  return(
+    <View style={styles.settings}>
+      <Icon
+        raised
+        reverse
+        name='settings'
+        type='material-icons'
+        onPress={toggleOverlay}
+      />
+      <Overlay
+        overlayStyle= {styles.settingsOverlay}
+        visible= {visible}
+        onBackdropPress={toggleOverlay}
+        animationType={'slide'}
+      >
+        <View style={{flexDirection: 'row', marginBottom: 25}}>
+          <ButtonGroup
+             onPress={unit => changeWeightUnit(unit)}
+             selectedIndex={weightUnit}
+             buttons={['kg', 'lbs']}
+             containerStyle={{width: 135, marginLeft: 0}}
+          />
+          <ButtonGroup
+             onPress={unit => changeHeightUnit(unit)}
+             selectedIndex={heightUnit}
+             buttons={['cm', 'f\' in\"']}
+             containerStyle={{width: 135, marginRight: 0}}
+          />
+        </View>
+        <Button
+          title= "OK"
+          onPress= {closeOverlay}
+        />
+      </Overlay>
+    </View>
+  )
 }
 
 const Din = () => {
   const {skier} = useContext(Context)
   return(
-    <View style = {styles.din} >
-     <Text h1>DIN = {calcDIN(skier)}</Text>
+    <View style = {styles.din}>
+     <Text h1>{calcDIN(skier)}</Text>
     </View>
   );
 }
@@ -140,13 +221,11 @@ function calcDIN(skier) {
   if (bsl == null) return 'Set BSL'
   if (type == null) return 'Set Type'
 
-  var i = Math.min(weight, height+7) + type
+  let i = Math.min(weight, height+7) + type
   if (age != 1) --i
   i = Math.max(0, i)
 
-  var j = bsl
-
-  return DIN[i][j]
+  return DIN[i][bsl]
 }
 
 export default function App() {
@@ -160,21 +239,26 @@ export default function App() {
   }
   const [skier, setSkier] = useState(initalSkier)
 
-  const initalSettings = {
+  const initalWHSettings = {
     weightsList: WEIGHTS_M,
     heightsList: HEIGHTS_M,
   }
-  const [settings, setSettings] = useState(initalSettings)
+  const [whSettings, setWHSettings] = useState(initalWHSettings)
 
-  const contextValues = {skier, setSkier, settings, setSettings}
+  const contextValues = {skier, setSkier, whSettings, setWHSettings}
 
   return (
     <SafeAreaView style = {{ flex: 1 }}>
       <Context.Provider value={contextValues}>
         <View style = {styles.container}>
-          <Options/>
-          <Input/>
+          <Inputs/>
+          <Settings/>
           <Din/>
+          <AdMobBanner
+            bannerSize="smartBannerPortrait"
+            adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
+            servePersonalizedAds // true or false
+          />
         </View>
       </Context.Provider>
     </SafeAreaView>
