@@ -1,5 +1,5 @@
 import React, { useState, createContext, useContext } from 'react'
-import { StyleSheet, View, ScrollView, Platform} from 'react-native'
+import { StyleSheet, View, ScrollView, Platform, ImageBackground} from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { AdMobBanner } from 'expo-ads-admob'
 import {
@@ -14,10 +14,8 @@ import {
 import {
   DIN,
   AGES,
-  WEIGHTS_M,
-  HEIGHTS_M,
-  WEIGHTS_US,
-  HEIGHTS_US,
+  WEIGHTS,
+  HEIGHTS,
   BSLS,
   TYPES
 } from './dinData'
@@ -32,24 +30,43 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-evenly'
   },
-  inputs: {
-    //flex:1,
+  list: {
+    backgroundColor: '#6494aaaf',
   },
-  settings: {
-    //flex: 1,
-    paddingTop: 20,
-    paddingRight: 20,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
+  listText: {
+    color: '#1a281f',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
-  settingsOverlay: {
-    padding: 25,
-    justifyContent: 'space-around',
+  chevron: {
+    color: '#1a281f',
+  },
+  badge: {
+    backgroundColor: '#f58f29',
+    padding: 11,
+    borderWidth: 0,
+  },
+  badgeText: {
+    color: '#1a281f',
+    fontSize: 16,
+  },
+  okButton: {
+    marginHorizontal: 10,
   },
   din: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+  },
+  dinBadge: {
+    backgroundColor: '#f58f29',
+    padding: 28,
+    borderWidth: 0,
+  },
+  dinBadgeText: {
+    color: '#1a281f',
+    fontSize: 46,
+    fontWeight: 'bold',
   },
 })
 
@@ -62,10 +79,11 @@ const SAge = (props) => {
          onPress={(index) => setIndex(index)}
          selectedIndex={index}
          buttons={AGES}
-         containerStyle={{height: 100}}
+         containerStyle={{}}
       />
       <Button
         title= "OK"
+        buttonStyle={styles.okButton}
         onPress= {() => {
           setSkier(skier => { return { ...skier, age: index }})
           props.closeOverlay()
@@ -76,20 +94,22 @@ const SAge = (props) => {
 };
 
 const SWeight = (props) => {
-  const {skier, setSkier, whSettings} = useContext(Context)
+  const {skier, setSkier} = useContext(Context)
   const [index, setIndex] = useState(skier.weight == null ? 0 : skier.weight)
   return(
     <>
-    <ScrollView>
-      <ButtonGroup
-         onPress={(index) => setIndex(index)}
-         selectedIndex={index}
-         buttons={whSettings.weightsList}
-         vertical='True'
-      />
-    </ScrollView>
+      <ScrollView>
+        <ButtonGroup
+          vertical
+          containerStyle={styles.whButtons}
+          onPress={(index) => setIndex(index)}
+          selectedIndex={index}
+          buttons={WEIGHTS}
+        />
+      </ScrollView>
       <Button
         title= "OK"
+        buttonStyle={styles.okButton}
         onPress= {() => {
           setSkier(skier => { return { ...skier, weight: index }})
           props.closeOverlay()
@@ -100,20 +120,22 @@ const SWeight = (props) => {
 };
 
 const SHeight = (props) => {
-  const {skier, setSkier, whSettings} = useContext(Context)
+  const {skier, setSkier} = useContext(Context)
   const [index, setIndex] = useState(skier.height == null ? 0 : skier.height)
   return(
     <>
-    <ScrollView>
-      <ButtonGroup
-         onPress={(index) => setIndex(index)}
-         selectedIndex={index}
-         buttons={whSettings.heightsList}
-         vertical='True'
-      />
-    </ScrollView>
+      <ScrollView>
+        <ButtonGroup
+          vertical
+          onPress={(index) => setIndex(index)}
+          selectedIndex={index}
+          buttons={HEIGHTS}
+          vertical
+        />
+      </ScrollView>
       <Button
         title= "OK"
+        buttonStyle={styles.okButton}
         onPress= {() => {
           setSkier(skier => { return { ...skier, height: index }})
           props.closeOverlay()
@@ -128,16 +150,17 @@ const BSL = (props) => {
   const [index, setIndex] = useState(skier.bsl == null ? 0 : skier.bsl)
   return(
     <>
-    <ScrollView>
-      <ButtonGroup
-         onPress={(index) => setIndex(index)}
-         selectedIndex={index}
-         buttons={BSLS}
-         vertical='True'
-      />
-    </ScrollView>
+      <ScrollView>
+        <ButtonGroup
+           onPress={(index) => setIndex(index)}
+           selectedIndex={index}
+           buttons={BSLS}
+           vertical='True'
+        />
+      </ScrollView>
       <Button
         title= "OK"
+        buttonStyle={styles.okButton}
         onPress= {() => {
           setSkier(skier => { return { ...skier, bsl: index }})
           props.closeOverlay()
@@ -152,13 +175,14 @@ const SType = (props) => {
   const [index, setIndex] = useState(skier.type == null ? 1 : skier.type)
   return(
     <>
-    <ButtonGroup
-       onPress={(index) => setIndex(index)}
-       selectedIndex={index}
-       buttons={TYPES}
-    />
+      <ButtonGroup
+         onPress={(index) => setIndex(index)}
+         selectedIndex={index}
+         buttons={TYPES}
+      />
       <Button
         title= "OK"
+        buttonStyle={styles.okButton}
         onPress= {() => {
           setSkier(skier => { return { ...skier, type: index }})
           props.closeOverlay()
@@ -170,7 +194,7 @@ const SType = (props) => {
 
 const Inputs = () => {
 
-  const {skier, whSettings} = useContext(Context)
+  const {skier} = useContext(Context)
   const [visible, setVisible] = useState(false)
   const [content, setContent] = useState()
 
@@ -190,12 +214,12 @@ const Inputs = () => {
     {
       title: 'Skier Weight',
       content: <SWeight closeOverlay={closeOverlay} />,
-      badge: whSettings.weightsList[skier.weight]
+      badge: WEIGHTS[skier.weight]
     },
     {
       title: 'Skier Height',
       content: <SHeight closeOverlay={closeOverlay} />,
-      badge: whSettings.heightsList[skier.height]
+      badge: HEIGHTS[skier.height]
     },
     {
       title: 'Boot Sole Length',
@@ -214,93 +238,28 @@ const Inputs = () => {
       {
         components.map((l, i) => (
           <ListItem
-            style = {{  }}
+            containerStyle={styles.list}
             key={i}
-            bottomDivider
             onPress={() => {
               toggleOverlay()
               setContent(l.content)
             }}
           >
             <ListItem.Content>
-              <ListItem.Title>{l.title}</ListItem.Title>
+              <ListItem.Title style={styles.listText}>{l.title}</ListItem.Title>
             </ListItem.Content>
-            {l.badge && (<Badge value={l.badge} status="primary" />)}
-            <ListItem.Chevron />
+            {l.badge && (<Badge value={l.badge} badgeStyle={styles.badge} textStyle={styles.badgeText} />)}
+            <ListItem.Chevron iconStyle={styles.chevron}/>
           </ListItem>
         ))
       }
       <Overlay
         visible= {visible}
         onBackdropPress={toggleOverlay}
-        fullScreen
-        animationType={'slide'}
+        animationType={'fade'}
+        overlayStyle={{width: '80%'}}
       >
         {content}
-      </Overlay>
-    </View>
-  )
-}
-
-const Settings = () => {
-
-  //data state
-  const {whSettings, setWHSettings} = useContext(Context)
-  const [weightUnit, setWeightUnit] = useState(0)
-  const [heightUnit, setHeightUnit] = useState(0)
-  function changeWeightUnit(unit) {
-    whSettings.weightsList = unit ? WEIGHTS_US : WEIGHTS_M
-    setWHSettings(whSettings => { return {...whSettings}})
-    setWeightUnit(unit)
-  }
-  function changeHeightUnit(unit) {
-    whSettings.heightsList = unit ? HEIGHTS_US : HEIGHTS_M
-    setWHSettings(whSettings => { return {...whSettings}})
-    setHeightUnit(unit)
-  }
-
-  //overlay state
-  const [visible, setVisible] = useState(false)
-  const toggleOverlay = () => {
-    setVisible(!visible)
-  }
-  const closeOverlay = () => {
-    setVisible(false)
-  }
-
-  return(
-    <View style={styles.settings}>
-      <Icon
-        raised
-        reverse
-        name='settings'
-        type='material-icons'
-        onPress={toggleOverlay}
-      />
-      <Overlay
-        overlayStyle= {styles.settingsOverlay}
-        visible= {visible}
-        onBackdropPress={toggleOverlay}
-        animationType={'slide'}
-      >
-        <View style={{flexDirection: 'row', marginBottom: 25}}>
-          <ButtonGroup
-             onPress={unit => changeWeightUnit(unit)}
-             selectedIndex={weightUnit}
-             buttons={['kg', 'lbs']}
-             containerStyle={{width: 135, marginLeft: 0}}
-          />
-          <ButtonGroup
-             onPress={unit => changeHeightUnit(unit)}
-             selectedIndex={heightUnit}
-             buttons={['cm', 'f\' in\"']}
-             containerStyle={{width: 135, marginRight: 0}}
-          />
-        </View>
-        <Button
-          title= "OK"
-          onPress= {closeOverlay}
-        />
       </Overlay>
     </View>
   )
@@ -310,7 +269,11 @@ const Din = () => {
   const {skier} = useContext(Context)
   return(
     <View style = {styles.din}>
-     <Text h1>{calcDIN(skier)}</Text>
+      <Badge
+        value={calcDIN(skier)}
+        badgeStyle={styles.dinBadge}
+        textStyle={styles.dinBadgeText}
+      />
     </View>
   );
 }
@@ -353,28 +316,26 @@ export default function App() {
   }
   const [skier, setSkier] = useState(initalSkier)
 
-  const initalWHSettings = {
-    weightsList: WEIGHTS_M,
-    heightsList: HEIGHTS_M,
-  }
-  const [whSettings, setWHSettings] = useState(initalWHSettings)
-
-  const contextValues = {skier, setSkier, whSettings, setWHSettings}
+  const contextValues = {skier, setSkier}
 
   return (
-    <SafeAreaView style = {{ flex: 1 }}>
-      <Context.Provider value={contextValues}>
-        <View style = {styles.container}>
+    <Context.Provider value={contextValues}>
+      <ImageBackground
+        source={require('./assets/eagal.jpg')}
+        resizeMode='cover'
+        style={styles.container}
+      >
+        <SafeAreaView style={styles.container}>
           <Inputs/>
-          <Settings/>
           <Din/>
           <AdMobBanner
             bannerSize="smartBannerPortrait"
             adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
-            servePersonalizedAds // true or false
+            servePersonalizedAds
           />
-        </View>
-      </Context.Provider>
-    </SafeAreaView>
+        </SafeAreaView>
+      </ImageBackground>
+    </Context.Provider>
+
   )
 }
