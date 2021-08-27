@@ -1,0 +1,11 @@
+- Make text in din output box more centred
+- Make skier inputs separated and possibly round corners
+- Add skier type description
+- Waiver or accept terms on initial startup
+- Make input popups prettier
+- Remove chevron
+- Make app icon
+- Switch to production adds
+- Build android package
+- Key sign
+- Release to app store

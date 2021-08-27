@@ -31,7 +31,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly'
   },
   list: {
-    backgroundColor: '#6494aaaf',
+    backgroundColor: '#BEBEBEbf',
+    borderRadius: 17,
+    margin: 5,
+    borderWidth: 3,
+    borderColor: '#444444'
   },
   listText: {
     color: '#1a281f',
@@ -42,7 +46,8 @@ const styles = StyleSheet.create({
     color: '#1a281f',
   },
   badge: {
-    backgroundColor: '#f58f29',
+    backgroundColor: '#E3A857',
+    borderRadius: 17,
     padding: 11,
     borderWidth: 0,
   },
@@ -59,9 +64,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   dinBadge: {
-    backgroundColor: '#f58f29',
+    backgroundColor: '#E3A857',
     padding: 28,
-    borderWidth: 0,
+    borderRadius: 17,
+    borderWidth: 3,
+    borderColor: '#444444'
   },
   dinBadgeText: {
     color: '#1a281f',
